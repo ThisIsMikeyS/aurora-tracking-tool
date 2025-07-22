@@ -147,7 +147,7 @@ def get_long_term_forecast():
             parts = line.strip().split()
             if len(parts) >= 6 and parts[0].isdigit():
                 try:
-                    date_str = f"{parts[0]}-{parts[1]}-{parts[2]}"
+                    date_str = f"{parts[2]} {parts[1]}"
                     kp = float(parts[5])  # Largest Kp Index
                     dates.append(date_str)
                     kp_values.append(kp)
@@ -168,7 +168,7 @@ def plot_3_day_forecast_chart(self, times, kp_values):
 
     # Convert Kp values to floats
     kp_values_float = [float(kp) for kp in kp_values]
-    times_fmt = [datetime.strptime(t, '%Y-%m-%d %H:%M:%S').strftime('%m-%d %H:%M') for t in times]
+    times_fmt = [datetime.strptime(t, '%Y-%m-%d %H:%M:%S').strftime('%d %b %H:%M') for t in times]
     colors = [get_kp_color(kp) for kp in kp_values_float]
 
     # Create bars

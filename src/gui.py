@@ -5,8 +5,13 @@ Allows user to view KP index, aurora maps, solar data, forecasts, and webcam fee
 """
 
 import tkinter as tk
+import webbrowser
+from datetime import datetime
 from tkinter import ttk, messagebox
+from matplotlib import dates
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
+from matplotlib.figure import Figure
+import matplotlib.pyplot as plt
 from aurora.aurora_map_overlay import generate_aurora_map
 from aurora.kp_index import get_current_kp_index
 from aurora.forecast import get_hourly_forecast, get_long_term_forecast, plot_3_day_forecast_chart, plot_long_term_forecast_chart
@@ -15,7 +20,6 @@ from aurora.solar_data import download_sun_image, get_solar_wind_data, get_sun_i
 from aurora.webcams import get_live_webcams
 from aurora.viewer_ranker import get_top_locations
 from PIL import Image, ImageTk
-import webbrowser
 
 
 class AuroraTrackerApp:
@@ -31,6 +35,7 @@ class AuroraTrackerApp:
         self.setup_forecast_tab()
         self.setup_map_tab()
         self.setup_solar_tab()
+        self.setup_sun_tab()
         self.setup_webcam_tab()
 
         self.notebook.bind("<<NotebookTabChanged>>", self.on_tab_changed)
@@ -43,6 +48,59 @@ class AuroraTrackerApp:
         canvas = FigureCanvasTkAgg(fig, master=self.forecast_chart_frame)
         canvas.draw()
         canvas.get_tk_widget().pack(fill=tk.BOTH, expand=True)
+
+    def _draw_solar_charts(self, plasma_times, speeds, densities, mag_times, bz_values, bt_values):
+        """
+        Display four separate charts for solar wind data:
+        - Speed (km/s)
+        - Density (p/cc)
+        - Bz (nT)
+        - Bt (nT)
+        """
+        # Clear previous charts
+        for widget in self.solar_chart_frame.winfo_children():
+            widget.destroy()
+
+        def embed_chart(title, times, values, ylabel):
+            fig, ax = plt.subplots(figsize=(8, 3))
+            ax.plot(times, values, color='red', linewidth=1.5)
+            ax.set_title(title)
+            ax.set_ylabel(ylabel)
+            ax.set_xlabel("Time (UTC)")
+
+            if len(times) >= 5:
+                ax.set_xticks([
+                    times[0],
+                    times[len(times)//4],
+                    times[len(times)//2],
+                    times[3*len(times)//4],
+                    times[-1]
+                ])
+
+            ax.tick_params(axis='x', rotation=45)
+            ax.grid(True)
+            fig.tight_layout()
+
+            # Create a container frame that fills X but centers the graph inside it
+            container = ttk.Frame(self.solar_chart_frame)
+            container.pack(fill='x', pady=10)  # fill horizontally
+
+            canvas = FigureCanvasTkAgg(fig, master=container)
+            canvas.draw()
+            canvas.get_tk_widget().pack(anchor='center')  # center inside the horizontal frame
+
+        if plasma_times and speeds:
+            embed_chart("Solar Wind Speeds (km/s)", plasma_times, speeds, "Speed (km/s)")
+
+        if plasma_times and densities:
+            embed_chart("Solar Wind Density (p/cc)", plasma_times, densities, "Density (p/cc)")
+
+        if mag_times and bz_values:
+            embed_chart("Solar Wind Bz (nT)", mag_times, bz_values, "Bz (nT)")
+
+        if mag_times and bt_values:
+            embed_chart("Solar Wind Bt (nT)", mag_times, bt_values, "Bt (nT)")
+
 
     def on_tab_changed(self, event):
         selected_tab = event.widget.select()
@@ -66,9 +124,6 @@ class AuroraTrackerApp:
 
         help_button = ttk.Button(tab, text="Help", command=self.show_map_help)
         help_button.pack(pady=5)
-
-        # self.location_list = tk.Listbox(tab, height=10, width=80)
-        # self.location_list.pack(pady=10)
 
         self.update_kp_index()
 
@@ -120,21 +175,11 @@ class AuroraTrackerApp:
         ttk.Button(tab, text="Short-Term Forecast", command=self.show_hourly_forecast).pack(pady=10)
         ttk.Button(tab, text="Long-Term Forecast", command=self.show_long_forecast).pack(pady=10)
 
-        # self.forecast_text = tk.Text(tab, height=20, wrap="word")
-        # self.forecast_text.pack(fill=tk.BOTH, expand=True)
-
         self.forecast_chart_frame = ttk.Frame(tab)
         self.forecast_chart_frame.pack(fill=tk.BOTH, expand=True)
 
         scrollbar = ttk.Scrollbar(self.forecast_chart_frame, orient='vertical')
         scrollbar.pack(side='right', fill='y')
-
-
-    # def show_hourly_forecast(self):
-    #     """Display hourly Kp index forecast in the text area."""
-    #     forecast = get_hourly_forecast()
-    #     self.forecast_text.delete(1.0, tk.END)
-    #     self.forecast_text.insert(tk.END, forecast)
 
     def show_hourly_forecast(self):
         """
@@ -151,12 +196,6 @@ class AuroraTrackerApp:
 
         except Exception as e:
             messagebox.showerror("Short-Term Forecast Error", f"Failed to load forecast: {e}")
-
-    # def show_long_forecast(self):
-    #     """Display the long-term aurora forecast in the forecast text widget."""
-    #     self.forecast_text.delete(1.0, tk.END)  
-    #     forecast = get_long_term_forecast()
-    #     self.forecast_text.insert(tk.END, forecast)
 
     def show_long_forecast(self):
         """
@@ -197,19 +236,64 @@ class AuroraTrackerApp:
         tab = ttk.Frame(self.notebook)
         self.notebook.add(tab, text="Solar Data")
 
-        ttk.Button(tab, text="Fetch Solar Wind Data", command=self.display_solar_data).pack(pady=10)
-        self.solar_text = tk.Text(tab, height=10)
-        self.solar_text.pack()
+        ttk.Button(tab, text="Fetch Solar Wind Data", command=self.show_solar_wind_graphs).pack(pady=10)
 
-        ttk.Button(tab, text="Show Sun Image", command=self.display_sun_image).pack(pady=10)
-        self.sun_label = ttk.Label(tab)
-        self.sun_label.pack()
+        # Create a canvas and a scrollable frame
+        canvas = tk.Canvas(tab, background="#f0f0f0")
+        scrollbar = ttk.Scrollbar(tab, orient="vertical", command=canvas.yview)
+        canvas.configure(yscrollcommand=scrollbar.set)
+
+        scrollbar.pack(side="right", fill="y")
+        canvas.pack(side="left", fill="both", expand=True)
+
+        self.solar_chart_frame = ttk.Frame(canvas)
+    
+        # Bind frame resizing to canvas size
+        self.solar_chart_frame.bind(
+            "<Configure>",
+            lambda e: canvas.configure(scrollregion=canvas.bbox("all"))
+        )
+
+        # Allow the internal frame to match the width of the canvas
+        window = canvas.create_window((0, 0), window=self.solar_chart_frame, anchor="nw")
+
+        # Stretch inner frame width with canvas
+        def resize_frame(event):
+            canvas.itemconfig(window, width=event.width)
+        canvas.bind("<Configure>", resize_frame)
+
+        # Enable mouse wheel scrolling
+        def _on_mousewheel(event):
+            canvas.yview_scroll(int(-1 * (event.delta / 120)), "units")
+    
+        canvas.bind_all("<MouseWheel>", _on_mousewheel)
 
     def display_solar_data(self):
         data = get_solar_wind_data()
         self.solar_text.delete("1.0", tk.END)
         for k, v in data.items():
             self.solar_text.insert(tk.END, f"{k}: {v}\n")
+
+    def show_solar_wind_graphs(self):
+        """Fetch and render solar wind line charts."""
+        try:
+            plasma_times, speeds, densities, mag_times, bz_values, bt_values = get_solar_wind_data()
+
+            if not plasma_times or not mag_times:
+                raise ValueError("Could not retrieve solar data.")
+
+            self._draw_solar_charts(plasma_times, speeds, densities, mag_times, bz_values, bt_values)
+
+        except Exception as e:
+            messagebox.showerror("Solar Data Error", f"Failed to load solar wind data: {e}")
+
+    def setup_sun_tab(self):
+        tab = ttk.Frame(self.notebook)
+        self.notebook.add(tab, text="Sun Images")
+
+        ttk.Button(tab, text="Show Sun Image", command=self.display_sun_image).pack(pady=10)
+        self.sun_label = ttk.Label(tab)
+        self.sun_label.pack()
 
     def display_sun_image(self):
         try:
