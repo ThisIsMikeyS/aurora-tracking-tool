@@ -12,13 +12,10 @@ from datetime import datetime, timedelta, timezone
 
 # Directory to store the latest image locally
 IMAGE_DIR = Path("assets/images")
-IMAGE_NAME = "solar_disk_aia_193.jpg"
-IMAGE_PATH = IMAGE_DIR / IMAGE_NAME
 
 # Data URLs
-SOLAR_WIND_API = "https://services.swpc.noaa.gov/products/solar-wind/plasma-1-day.json"
-PLASMA_API = "https://services.swpc.noaa.gov/products/solar-wind/plasma-1-day.json"
-MAGNETIC_API = "https://services.swpc.noaa.gov/products/solar-wind/mag-1-day.json"
+PLASMA_URL = "https://services.swpc.noaa.gov/products/solar-wind/plasma-1-day.json"
+MAGNETIC_URL = "https://services.swpc.noaa.gov/products/solar-wind/mag-1-day.json"
 SUN_IMAGE_URL = "https://sdo.gsfc.nasa.gov/assets/img/latest/latest_1024_0193.jpg"
 
 def get_solar_wind_data():
@@ -40,7 +37,7 @@ def get_solar_wind_data():
         cutoff = now - timedelta(hours=2)
 
         # --- Fetch Plasma Data ---
-        r_plasma = requests.get(PLASMA_API, timeout=10)
+        r_plasma = requests.get(PLASMA_URL, timeout=10)
         r_plasma.raise_for_status()
         plasma_json = r_plasma.json()
 
@@ -65,7 +62,7 @@ def get_solar_wind_data():
                 densities.append(float(density))
 
         # --- Fetch Magnetic Field Data ---
-        r_mag = requests.get(MAGNETIC_API, timeout=10)
+        r_mag = requests.get(MAGNETIC_URL, timeout=10)
         r_mag.raise_for_status()
         mag_json = r_mag.json()
 
@@ -99,41 +96,47 @@ def get_solar_wind_data():
         return [], [], [], [], [], []
 
 
-def download_sun_image(save_path: Path = IMAGE_PATH) -> Path:
+def download_sun_image(name: str, url: str, save_dir: Path = IMAGE_DIR) -> Path:
     """
-    Downloads the latest sun image (AIA 193) and saves it locally.
-    
-    Args:
-        save_path (Path): Destination path to save the image.
-    
-    Returns:
-        Path: Path to the downloaded image file.
+    Downloads a solar image by name and URL.
     """
     try:
-        print(f"[INFO] Downloading SWPC Ovation image from {SUN_IMAGE_URL}")
-        response = requests.get(SUN_IMAGE_URL, stream=True, timeout=10)
+        save_dir.mkdir(parents=True, exist_ok=True)
+        save_path = save_dir / f"{name}.jpg"
+
+        response = requests.get(url, timeout=10)
         response.raise_for_status()
 
-        # Ensure the directory exists
-        save_path.parent.mkdir(parents=True, exist_ok=True)
-
-        # Save the image to the specified path
         with open(save_path, "wb") as file:
-            for chunk in response.iter_content(chunk_size=8192):
-                file.write(chunk)
+            file.write(response.content)
 
-        print(f"[SUCCESS] Sun map saved to {save_path}")
         return save_path
 
-    except requests.RequestException as e:
-        print(f"[ERROR] Failed to download Sun image: {e}")
+    except Exception as e:
+        print(f"[ERROR] Failed to download {name}: {e}")
         return None
 
-def get_sun_image():
-    """
-    Fetch the URL of the latest image of the solar disk.
 
-    Returns:
-        str: URL to the live solar image.
-    """
-    return SUN_IMAGE_URL
+def get_sun_image_urls():
+    return [
+        ["solar_disk_aia_0193", "https://sdo.gsfc.nasa.gov/assets/img/latest/latest_1024_0193.jpg"],
+        ["solar_disk_aia_0304", "https://sdo.gsfc.nasa.gov/assets/img/latest/latest_1024_0304.jpg"],
+        ["solar_disk_aia_0171", "https://sdo.gsfc.nasa.gov/assets/img/latest/latest_1024_0171.jpg"],
+        ["solar_disk_aia_0211", "https://sdo.gsfc.nasa.gov/assets/img/latest/latest_1024_0211.jpg"],
+        ["solar_disk_aia_0131", "https://sdo.gsfc.nasa.gov/assets/img/latest/latest_1024_0131.jpg"],
+        ["solar_disk_aia_0335", "https://sdo.gsfc.nasa.gov/assets/img/latest/latest_1024_0335.jpg"],
+        ["solar_disk_aia_0094", "https://sdo.gsfc.nasa.gov/assets/img/latest/latest_1024_0094.jpg"],
+        ["solar_disk_aia_1600", "https://sdo.gsfc.nasa.gov/assets/img/latest/latest_1024_1600.jpg"],
+        ["solar_disk_aia_1700", "https://sdo.gsfc.nasa.gov/assets/img/latest/latest_1024_1700.jpg"],
+        ["solar_disk_aia_211193171", "https://sdo.gsfc.nasa.gov/assets/img/latest/latest_1024_211193171.jpg"],
+        ["solar_disk_aia_304211171", "https://sdo.gsfc.nasa.gov/assets/img/latest/f_304_211_171_1024.jpg"],
+        ["solar_disk_aia_94335193", "https://sdo.gsfc.nasa.gov/assets/img/latest/f_094_335_193_1024.jpg"],
+        ["solar_disk_aia_0171_HMIB", "https://sdo.gsfc.nasa.gov/assets/img/latest/f_HMImag_171_1024.jpg"],
+        ["solar_disk_HMIB", "https://sdo.gsfc.nasa.gov/assets/img/latest/latest_1024_HMIB.jpg"],
+        ["solar_disk_HMIBC", "https://sdo.gsfc.nasa.gov/assets/img/latest/latest_1024_HMIBC.jpg"],
+        ["solar_disk_HMIIC", "https://sdo.gsfc.nasa.gov/assets/img/latest/latest_1024_HMIIC.jpg"],
+        ["solar_disk_HMIIF", "https://sdo.gsfc.nasa.gov/assets/img/latest/latest_1024_HMIIF.jpg"],
+        ["solar_disk_HMII", "https://sdo.gsfc.nasa.gov/assets/img/latest/latest_1024_HMII.jpg"],
+        ["solar_disk_HMID", "https://sdo.gsfc.nasa.gov/assets/img/latest/latest_1024_HMID.jpg"]
+    ]
+

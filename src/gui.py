@@ -16,7 +16,7 @@ from aurora.aurora_map_overlay import generate_aurora_map
 from aurora.kp_index import get_current_kp_index
 from aurora.forecast import get_hourly_forecast, get_long_term_forecast, plot_3_day_forecast_chart, plot_long_term_forecast_chart
 from aurora.swpc_map import download_swpc_map
-from aurora.solar_data import download_sun_image, get_solar_wind_data, get_sun_image
+from aurora.solar_data import download_sun_image, get_solar_wind_data, get_sun_image_urls
 from aurora.webcams import get_live_webcams
 from aurora.viewer_ranker import get_top_locations
 from PIL import Image, ImageTk
@@ -100,6 +100,60 @@ class AuroraTrackerApp:
 
         if mag_times and bt_values:
             embed_chart("Solar Wind Bt (nT)", mag_times, bt_values, "Bt (nT)")
+
+    def _load_sun_images_with_progress(self, urls, progress_bar):
+        for index, (name, url) in enumerate(urls):
+            path = download_sun_image(name, url)
+            if not path or not path.exists():
+                continue
+
+            try:
+                img = Image.open(path)
+                img_resized = img.resize((400, 400))
+                photo = ImageTk.PhotoImage(img_resized)
+                self.sun_image_refs.append(photo)
+
+                zoomed_img = img.resize((800, 800))
+                zoomed_photo = ImageTk.PhotoImage(zoomed_img)
+                self.sun_image_refs.append(zoomed_photo)
+
+                frame = tk.Frame(self.sun_image_container, bg="#f0f0f0")
+                frame.pack(pady=10)
+
+                label = tk.Label(frame, image=photo)
+                label.pack()
+
+                caption = tk.Label(frame, text=name, font=("Arial", 10, "italic"))
+                caption.pack()
+
+                def on_enter(event, img=zoomed_photo, title=name):
+                    if self.zoom_window is not None:
+                        self.zoom_window.destroy()
+                    self.zoom_window = tk.Toplevel()
+                    self.zoom_window.title(f"Zoom: {title}")
+                    self.zoom_window.geometry("+%d+%d" % (event.x_root + 20, event.y_root))
+                    self.zoom_window.overrideredirect(True)
+                    zoom_label = tk.Label(self.zoom_window, image=img)
+                    zoom_label.pack()
+
+                def on_leave(event):
+                    if self.zoom_window:
+                        self.zoom_window.destroy()
+                        self.zoom_window = None
+
+                label.bind("<Enter>", on_enter)
+                label.bind("<Leave>", on_leave)
+
+            except Exception as e:
+                print(f"[ERROR] Could not load image {name}: {e}")
+
+            # Update progress bar
+            progress_bar["value"] = index + 1
+            self.sun_image_container.update_idletasks()
+
+        # Remove the progress bar after all images are loaded
+        progress_bar.destroy()
+
 
 
     def on_tab_changed(self, event):
@@ -262,11 +316,18 @@ class AuroraTrackerApp:
             canvas.itemconfig(window, width=event.width)
         canvas.bind("<Configure>", resize_frame)
 
-        # Enable mouse wheel scrolling
+        # Mousewheel scroll — bind only while hovering
+        def on_enter(event):
+            canvas.bind_all("<MouseWheel>", _on_mousewheel)
+
+        def on_leave(event):
+            canvas.unbind_all("<MouseWheel>")
+
         def _on_mousewheel(event):
             canvas.yview_scroll(int(-1 * (event.delta / 120)), "units")
-    
-        canvas.bind_all("<MouseWheel>", _on_mousewheel)
+
+        canvas.bind("<Enter>", on_enter)
+        canvas.bind("<Leave>", on_leave)
 
     def display_solar_data(self):
         data = get_solar_wind_data()
@@ -291,9 +352,42 @@ class AuroraTrackerApp:
         tab = ttk.Frame(self.notebook)
         self.notebook.add(tab, text="Sun Images")
 
-        ttk.Button(tab, text="Show Sun Image", command=self.display_sun_image).pack(pady=10)
-        self.sun_label = ttk.Label(tab)
-        self.sun_label.pack()
+        ttk.Button(tab, text="Show Sun Images", command=self.display_sun_images).pack(pady=10)
+
+        # Create scrollable canvas
+        canvas = tk.Canvas(tab, background="#f0f0f0")
+        scrollbar = ttk.Scrollbar(tab, orient="vertical", command=canvas.yview)
+        canvas.configure(yscrollcommand=scrollbar.set)
+
+        scrollbar.pack(side="right", fill="y")
+        canvas.pack(side="left", fill="both", expand=True)
+
+        self.sun_image_container = ttk.Frame(canvas)
+        self.sun_image_container.bind(
+            "<Configure>",
+            lambda e: canvas.configure(scrollregion=canvas.bbox("all"))
+        )
+
+        # Center inside canvas
+        window = canvas.create_window((0, 0), window=self.sun_image_container, anchor="n")
+
+        def resize_frame(event):
+            canvas.itemconfig(window, width=event.width)
+        canvas.bind("<Configure>", resize_frame)
+
+        # Mousewheel scroll — bind only while hovering
+        def on_enter(event):
+            canvas.bind_all("<MouseWheel>", _on_mousewheel)
+
+        def on_leave(event):
+            canvas.unbind_all("<MouseWheel>")
+
+        def _on_mousewheel(event):
+            canvas.yview_scroll(int(-1 * (event.delta / 120)), "units")
+
+        canvas.bind("<Enter>", on_enter)
+        canvas.bind("<Leave>", on_leave)
+
 
     def display_sun_image(self):
         try:
@@ -303,6 +397,29 @@ class AuroraTrackerApp:
             self.sun_label.config(image=self.sun_img)
         except Exception as e:
             messagebox.showerror("Error", f"Could not load sun image: {e}")
+
+    def display_sun_images(self):
+        urls = get_sun_image_urls()
+
+        # Clear old images
+        for widget in self.sun_image_container.winfo_children():
+            widget.destroy()
+
+        self.sun_image_refs = []
+        self.zoom_window = None
+
+        # Create and pack the progress bar
+        progress = ttk.Progressbar(self.sun_image_container, mode='determinate', length=400)
+        progress.pack(pady=20)
+        progress["maximum"] = len(urls)
+        progress["value"] = 0
+
+        self.sun_image_container.update_idletasks()
+
+        # Delay processing to allow UI to draw progress bar
+        self.root.after(100, lambda: self._load_sun_images_with_progress(urls, progress))
+
+
 
     def setup_webcam_tab(self):
         tab = ttk.Frame(self.notebook)
