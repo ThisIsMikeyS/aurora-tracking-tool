@@ -1,0 +1,62 @@
+[
+  {
+    "name": "Troms�, Norway",
+    "latitude": 69.6496,
+    "longitude": 18.9560,
+    "description": "Popular Arctic city ideal for aurora watching due to long polar nights and good infrastructure."
+  },
+  {
+    "name": "Abisko, Sweden",
+    "latitude": 68.3518,
+    "longitude": 18.8314,
+    "description": "Known for clear skies and its location in the 'Blue Hole', Abisko offers consistent aurora views."
+  },
+  {
+    "name": "Fairbanks, Alaska, USA",
+    "latitude": 64.8378,
+    "longitude": -147.7164,
+    "description": "One of the best US-based locations for aurora sightings with strong support for skywatchers."
+  },
+  {
+    "name": "Yellowknife, Canada",
+    "latitude": 62.4540,
+    "longitude": -114.3718,
+    "description": "Remote location with high auroral activity and dedicated Northern Lights tourism services."
+  },
+  {
+    "name": "Reykjav�k, Iceland",
+    "latitude": 64.1355,
+    "longitude": -21.8954,
+    "description": "Easily accessible capital offering great aurora views with minimal light pollution nearby."
+  },
+  {
+    "name": "Murmansk, Russia",
+    "latitude": 68.9585,
+    "longitude": 33.0827,
+    "description": "Large Arctic city with frequent aurora displays during the long winter months."
+  },
+  {
+    "name": "Rovaniemi, Finland",
+    "latitude": 66.5039,
+    "longitude": 25.7294,
+    "description": "Located on the Arctic Circle, Rovaniemi is a famous destination for both auroras and Arctic tourism."
+  },
+  {
+    "name": "Kangerlussuaq, Greenland",
+    "latitude": 67.0121,
+    "longitude": -50.7116,
+    "description": "Greenland's best aurora spot thanks to low precipitation and minimal artificial light."
+  },
+  {
+    "name": "Svalbard, Norway",
+    "latitude": 78.2232,
+    "longitude": 15.6469,
+    "description": "Extremely high-latitude location allowing aurora sightings even during the daytime."
+  },
+  {
+    "name": "Lake Laberge, Yukon, Canada",
+    "latitude": 61.1892,
+    "longitude": -135.2516,
+    "description": "Remote viewing spot in Yukon offering vivid displays and reflection on the lake surface."
+  }
+]
