@@ -17,8 +17,7 @@ from aurora.kp_index import get_current_kp_index
 from aurora.forecast import get_hourly_forecast, get_long_term_forecast, plot_3_day_forecast_chart, plot_long_term_forecast_chart
 from aurora.swpc_map import download_swpc_map
 from aurora.solar_data import download_sun_image, get_solar_wind_data, get_sun_image_urls
-from aurora.webcams import get_live_webcams
-from aurora.viewer_ranker import get_top_locations
+from aurora.webcams import get_live_webcams_location_sorted, get_live_webcams_country_sorted, get_live_webcams_best_sorted
 from PIL import Image, ImageTk
 
 
@@ -33,7 +32,7 @@ class AuroraTrackerApp:
 
         self.setup_kp_tab()
         self.setup_forecast_tab()
-        self.setup_map_tab()
+        #self.setup_map_tab()
         self.setup_solar_tab()
         self.setup_sun_tab()
         self.setup_webcam_tab()
@@ -430,15 +429,46 @@ class AuroraTrackerApp:
         self.webcam_list.pack(fill=tk.BOTH, expand=True)
         ttk.Button(tab, text="Open Webcam", command=self.open_webcam).pack(pady=10)
 
-        cams = get_live_webcams()
+        cams = get_live_webcams_best_sorted()
+        self.webcam_url_map = {}  # Add this at the top of the method
+
         for cam in cams:
             location = cam.get("location")
+            country = cam.get("country")
             url = cam.get("url")
-            self.webcam_list.insert(tk.END, f"{location}:           {url}")
+            if location and url:
+                self.webcam_list.insert(tk.END, f"{location}, {country}")
+                self.webcam_url_map[f"{location}, {country}"] = url  # Map location to URL
+
+        help_button = ttk.Button(tab, text="Help", command=self.show_webcams_help)
+        help_button.pack(pady=5)
+
 
     def open_webcam(self):
         sel = self.webcam_list.curselection()
         if sel:
-            entry = self.webcam_list.get(sel[0])
-            _, url = entry.split(":           ")
-            webbrowser.open(url)
+            location = self.webcam_list.get(sel[0])
+            url = self.webcam_url_map.get(location)
+            if url:
+                webbrowser.open(url)
+            else:
+                messagebox.showerror("Webcam Error", f"No URL found for {location}")
+
+    def show_webcams_help(self):
+        help_text = (
+            "Aurora Webcams Tab Help\n\n"
+            "This tab shows a list of live webcam streams from locations around the world where the aurora (Northern or Southern Lights) may be visible.\n\n"
+            "How it works:\n"
+            "- The list is automatically sorted to prioritize webcams where the aurora is most likely visible right now.\n"
+            "- This takes into account:\n"
+            "   • The current Kp index (a measure of geomagnetic activity).\n"
+            "   • The latitude of the location.\n"
+            "   • Whether it is currently dark at the location (since aurora cannot be seen in daylight).\n\n"
+            "How to use:\n"
+            "1. Click on any webcam from the list.\n"
+            "2. Click the 'Open Webcam' button to open the live stream in your browser.\n\n"
+            "Use the Help button at any time to revisit these instructions."
+        )
+        from tkinter import messagebox
+        messagebox.showinfo("Aurora Webcams Help", help_text)
+
