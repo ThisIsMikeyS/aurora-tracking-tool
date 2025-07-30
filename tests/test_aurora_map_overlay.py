@@ -1,6 +1,10 @@
 """
-test_aurora_map_overlay.py
-Unittest for aurora_map_overlay with correct filtering behavior.
+Unit tests for the aurora_map_overlay.py
+Tests for:
+- Robust fetching of aurora forecast data with error handling.
+- Correct behavior when filtering and processing coordinate data.
+- Proper map generation output regardless of input dataset size.
+Uses unittest with mocks for network requests.
 """
 
 import sys, os, unittest

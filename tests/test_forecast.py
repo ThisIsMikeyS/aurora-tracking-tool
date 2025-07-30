@@ -1,6 +1,10 @@
 """
-Unit tests for forecast.py (Aurora forecast retrieval and plotting)
-Using unittest with mocks for API calls and matplotlib.
+Unit tests for the forecast.py
+Tests for:
+- Retrieval and parsing of hourly (3?day) and long?term (27?day) aurora forecasts.
+- Robust handling of malformed data and network/API exceptions.
+- Proper integration with plotting functions to generate forecast charts.
+Uses unittest with mocks for API calls and matplotlib.
 """
 
 import unittest
