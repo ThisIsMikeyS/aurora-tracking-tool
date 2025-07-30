@@ -1,3 +1,8 @@
+"""
+test_aurora_map_overlay.py
+Unittest for aurora_map_overlay with correct filtering behavior.
+"""
+
 import sys, os, unittest
 from unittest.mock import patch, MagicMock
 
