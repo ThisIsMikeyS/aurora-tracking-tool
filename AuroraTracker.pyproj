@@ -40,12 +40,15 @@
     <Compile Include="src\utils\image_utils.py" />
     <Compile Include="src\utils\__init__.py" />
     <Compile Include="src\__init__.py" />
+    <Compile Include="tests\test_aurora_map_overlay.py" />
     <Compile Include="tests\test_forecast.py" />
     <Compile Include="tests\test_gui.py" />
     <Compile Include="tests\test_kp_index.py" />
     <Compile Include="tests\test_location.py" />
     <Compile Include="tests\test_solar_data.py" />
+    <Compile Include="tests\test_swpc_map.py" />
     <Compile Include="tests\test_viewer_ranker.py" />
+    <Compile Include="tests\test_webcams.py" />
     <Compile Include="tests\__init__.py" />
   </ItemGroup>
   <ItemGroup>

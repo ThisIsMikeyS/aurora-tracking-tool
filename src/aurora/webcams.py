@@ -67,13 +67,14 @@ CAMERA_TIMEZONES = {
 def is_dark(lat, lon, location_name=None):
     """Returns True if it is currently dark at the location (sun below horizon)."""
     try:
+        # Get local timezone from predefined mapping, fallback to UTC
         if location_name and location_name in CAMERA_TIMEZONES:
             tz = pytz_timezone(CAMERA_TIMEZONES[location_name])
         else:
-            tz = timezone.utc  # Fallback
+            tz = timezone.utc  # fallback
 
         now_local = datetime.now(tz)
-        print(f"lat: {lat}  lon: {lon}  Local Date-time: {now_local}")
+        #print(f"lat: {lat}  lon: {lon}  Local Date-time: {now_local}")
 
         location = LocationInfo(latitude=lat, longitude=lon)
         s = sun(location.observer, date=now_local.date(), tzinfo=tz)
@@ -82,16 +83,18 @@ def is_dark(lat, lon, location_name=None):
 
     except ValueError as e:
         msg = str(e).lower()
-        if "never sets" in msg:
-            return False  # Always bright
-        elif "never reaches" in msg:
-            return True   # Always dark
+        if "degrees below" in msg:
+            print(f"[INFO] Sun never sets in {location_name} — assuming bright.")
+            return False
+        elif "degrees above" in msg:
+            print(f"[INFO] Sun never rises in {location_name} — assuming dark.")
+            return True
         else:
-            print(f"[WARN] Astral ValueError lat={lat}, lon={lon}: {e}")
+            print(f"[WARN] Astral raised ValueError for {location}: {e}")
             return False
 
     except Exception as e:
-        print(f"[WARN] Astral failed lat={lat}, lon={lon}: {e}")
+        print(f"[WARN] Astral failed for {location}: {e}")
         return False
 
 
