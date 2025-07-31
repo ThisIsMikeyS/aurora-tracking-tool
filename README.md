@@ -139,8 +139,13 @@ OK
 
 ## 🛠️ Future Improvements
 
+- Cloud coverage integration
+- Real-time aurora alerts
+- Enhanced webcam ranking algorithm
+- Light/dark theme toggle
+- Responsive GUI design
+- Auroral oval prediction animation
 - Bug fixing
-- 
 
 ---
 
