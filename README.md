@@ -1,7 +1,9 @@
 ﻿# 🌌 Aurora Tracker
+![Title Card](assets/images/aurora_tracker_icon.png)
 
-Aurora Tracker is a Python-based application that visualizes real-time and forecasted aurora activity using NOAA SWPC data, solar wind measurements, and live webcams.  
-It features a **Tkinter GUI** with multiple tabs for Kp index, aurora maps, solar wind charts, sun imagery, and global webcams.
+**Aurora Tracker is a Python-based application that visualizes real-time and forecasted aurora activity using NOAA SWPC data, solar wind measurements, and live webcams.**  
+
+It features a Tkinter GUI with multiple tabs for Kp index, aurora maps, solar wind charts, sun imagery, and global webcams.
 
 ---
 
