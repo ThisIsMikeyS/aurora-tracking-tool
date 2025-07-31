@@ -15,7 +15,6 @@ It features a Tkinter GUI with multiple tabs for Kp index, aurora maps, solar wi
 - **Solar Wind Data** – Live Bz, Bt, speed, and density plots.
 - **Sun Images** – Fetches latest SDO sun imagery.
 - **Aurora Webcams** – Curated list of live streams ranked by visibility.
-- **Location Ranking** – Ranks best global viewing spots based on Kp index & your location.
 
 ---
 
@@ -37,7 +36,7 @@ aurora-tracking-tool/
 │   ├── gui.py                       # GUI logic using tkinter
 │   ├── aurora/
 │   │   ├── __init__.py
-│   │   ├── aurora_map_overlay.py	 # Aurora probability map generation
+│   │   ├── aurora_map_overlay.py    # Aurora probability map generation
 │   │   ├── kp_index.py              # Current Kp index retrieval
 │   │   ├── forecast.py              # Short and long-term Kp index forecasts
 │   │   ├── swpc_map.py              # Get, download, and render SWPC aurora map (not in use)
@@ -58,9 +57,9 @@ aurora-tracking-tool/
 │
 │   └── config.py                    # API keys, constants, and user config
 │
-├── tests/							 # Unit tests for all modules
+├── tests/                           # Unit tests for all modules
 │
-├── assets/							 # Images/maps downloaded locally
+├── assets/                          # Images/maps downloaded locally
 │
 ├── requirements.txt
 ├── README.md
@@ -74,7 +73,6 @@ aurora-tracking-tool/
 
 ### ✅ Prerequisites
 
-- Windows 11 (or other OS with Python 3.10+)
 - [Python 3.10+](https://www.python.org/downloads/)
 - [Astral 3.2+](https://pypi.org/project/astral/)
 - [Basemap Toolkit 1.3+](https://pypi.org/project/basemap/)
