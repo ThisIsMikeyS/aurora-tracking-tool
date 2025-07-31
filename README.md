@@ -124,8 +124,12 @@ python -m unittest discover tests
 ```
 
 Includes tests for:
-- GUI 
-- 
+- Kp index retrieval
+- Aurora map generation
+- Solar wind data fetching
+- Webcam ranking
+- Location data parsing
+- GUI logic
 
 ### Expected final output:
 ```
