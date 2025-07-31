@@ -1,0 +1,13 @@
+# Core Python Libraries (standard library – no need to install)
+# datetime, math, os, pathlib, csv, io, json, sys, time, webbrowser, unittest
+
+# External dependencies
+requests>=2.31.0
+matplotlib>=3.8.0
+numpy>=1.26.0
+Pillow>=10.0.0
+tkintertable>=1.3.3
+basemap @ https://github.com/matplotlib/basemap/archive/refs/tags/v1.3.9.tar.gz
+pyproj>=3.6.0
+pytz>=2023.3
+astral>=3.2
