@@ -27,6 +27,36 @@ class AuroraTrackerApp:
         self.root.title("Aurora Tracker")
         self.root.geometry("900x800")
 
+        # ---- Dark Mode Theme Setup ----
+        style = ttk.Style(self.root)
+        
+        # Use a base theme that works cross-platform
+        style.theme_use("clam")
+        
+        # Set global colors
+        dark_bg = "#1f1f2e"  # dark navy
+        dark_fg = "#e0f7fa"  # light cyan text
+        accent = "#2e3b4e"   # slightly lighter for tabs / accents
+        
+        style.configure(".", 
+                        background=dark_bg,
+                        foreground=dark_fg,
+                        fieldbackground=dark_bg)
+        
+        # Configure ttk.Notebook tabs
+        style.configure("TNotebook", background=dark_bg, borderwidth=0)
+        style.configure("TNotebook.Tab", background=accent, foreground=dark_fg)
+        style.map("TNotebook.Tab",
+                  background=[("selected", dark_bg)],
+                  foreground=[("selected", dark_fg)])
+        
+        # Configure ttk.Labels & Buttons
+        style.configure("TLabel", background=dark_bg, foreground=dark_fg)
+        style.configure("TButton", background=accent, foreground=dark_fg)
+        style.map("TButton", background=[("active", "#3a4b63")])
+        
+        self.root.configure(bg=dark_bg)
+
         self.notebook = ttk.Notebook(self.root)
         self.notebook.pack(fill=tk.BOTH, expand=True)
 
