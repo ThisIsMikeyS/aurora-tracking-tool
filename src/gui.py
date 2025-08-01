@@ -7,6 +7,7 @@ Allows user to view KP index, aurora maps, solar data, forecasts, and webcam fee
 import tkinter as tk
 import webbrowser
 import threading
+import os
 from datetime import datetime
 from tkinter import ttk, messagebox
 from matplotlib import dates
@@ -27,6 +28,11 @@ class AuroraTrackerApp:
         self.root = root
         self.root.title("Aurora Tracker")
         self.root.geometry("900x800")
+
+        # Set custom icon (for Windows)
+        icon_path_ico = os.path.join("assets", "icons", "aurora_tracker_icon.ico")
+        if os.path.exists(icon_path_ico):
+            self.root.iconbitmap(icon_path_ico)
 
         # ---- Dark Mode Theme Setup ----
         style = ttk.Style(self.root)

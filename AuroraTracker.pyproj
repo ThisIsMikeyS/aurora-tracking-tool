@@ -53,6 +53,7 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="assets\" />
+    <Folder Include="assets\icons\" />
     <Folder Include="src\aurora\libraries\" />
     <Folder Include="src\data\icons\" />
     <Folder Include="tests\" />
