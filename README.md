@@ -116,6 +116,22 @@ python -m src.gui
 
 ---
 
+## 🖥️ Usage
+Once started:
+
+- The **KP Index & Visibility** tab shows the current Kp index and an aurora map overlay.
+
+- The **Forecasts** tab displays both short-term and long-term Kp index predictions.
+
+- The **Solar Data** tab plots recent solar wind and magnetic field measurements.
+
+- The **Sun Images** tab shows NASA SDO imagery with zoom support.
+
+- The **Aurora Webcams** tab lists live aurora webcams sorted by visibility.
+
+ℹ️ The application offers help tooltips on some sections for guidance.
+
+
 ## 🧪 Running Tests
 
 To run the unit tests:
