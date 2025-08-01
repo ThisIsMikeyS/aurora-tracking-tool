@@ -149,6 +149,7 @@ OK
 - Light/dark theme toggle
 - Responsive GUI design
 - Auroral oval prediction animation
+- Webcam preview thumbnails
 - Bug fixing
 
 ---
