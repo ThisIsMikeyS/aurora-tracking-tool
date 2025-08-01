@@ -192,6 +192,11 @@ class AuroraTrackerApp:
         if tab_text == "KP Index & Visibility":
             self.show_aurora_overlay()
 
+    def refresh_kp_and_map(self):
+        """Refresh both KP index and aurora overlay."""
+        self.update_kp_index()
+        self.show_aurora_overlay()
+
     def setup_kp_tab(self):
         tab = ttk.Frame(self.notebook)
         self.notebook.add(tab, text="KP Index & Visibility")
@@ -200,7 +205,7 @@ class AuroraTrackerApp:
         self.kp_label = ttk.Label(tab, text="Loading...", font=("Arial", 16, "bold"))
         self.kp_label.pack()
 
-        ttk.Button(tab, text="Refresh", command=self.update_kp_index).pack(pady=10)
+        ttk.Button(tab, text="Refresh", command=self.refresh_kp_and_map).pack(pady=10)
 
         self.map_canvas = tk.Canvas(tab, width=750, height=567, bg="black")
         self.map_canvas.pack(pady=10)
