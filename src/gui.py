@@ -74,9 +74,18 @@ class AuroraTrackerApp:
         for widget in self.forecast_chart_frame.winfo_children():
             widget.destroy()
 
-        canvas = FigureCanvasTkAgg(fig, master=self.forecast_chart_frame)
+        fig.tight_layout(pad=2.0)
+
+        # Create a container frame that fills X but centers the graph inside it
+        container = ttk.Frame(self.forecast_chart_frame)
+        container.pack(fill='x', pady=1)
+
+        canvas = FigureCanvasTkAgg(fig, master=container)
         canvas.draw()
-        canvas.get_tk_widget().pack(fill=tk.BOTH, expand=True)
+        canvas.get_tk_widget().pack(anchor='center')
+
+        plt.close(fig)  # ✅ Close the figure after embedding
+
 
     def _draw_solar_charts(self, plasma_times, speeds, densities, mag_times, bz_values, bt_values):
         """
@@ -266,8 +275,6 @@ class AuroraTrackerApp:
         self.forecast_chart_frame = ttk.Frame(tab)
         self.forecast_chart_frame.pack(fill=tk.BOTH, expand=True)
 
-        scrollbar = ttk.Scrollbar(self.forecast_chart_frame, orient='vertical')
-        scrollbar.pack(side='right', fill='y')
 
     def show_hourly_forecast(self):
         """
