@@ -6,6 +6,7 @@ Allows user to view KP index, aurora maps, solar data, forecasts, and webcam fee
 
 import tkinter as tk
 import webbrowser
+import threading
 from datetime import datetime
 from tkinter import ttk, messagebox
 from matplotlib import dates
@@ -393,7 +394,9 @@ class AuroraTrackerApp:
         tab = ttk.Frame(self.notebook)
         self.notebook.add(tab, text="Sun Images")
 
-        ttk.Button(tab, text="Show Sun Images", command=self.display_sun_images).pack(pady=10)
+        self.show_sun_button = ttk.Button(tab, text="Show Sun Images", command=self.display_sun_images)
+        self.show_sun_button.pack(pady=10)
+
 
         # Create scrollable canvas
         canvas = tk.Canvas(tab, background="#f0f0f0")
@@ -449,18 +452,80 @@ class AuroraTrackerApp:
         self.sun_image_refs = []
         self.zoom_window = None
 
+        # Disable button to prevent multiple loads
+        self.show_sun_button.config(state="disabled")
+
         # Create and pack the progress bar
-        progress = ttk.Progressbar(self.sun_image_container, mode='determinate', length=400)
-        progress.pack(pady=20)
-        progress["maximum"] = len(urls)
-        progress["value"] = 0
+        progress_bar = ttk.Progressbar(self.sun_image_container, mode='determinate', length=400)
+        progress_bar.pack(pady=20)
+        progress_bar["maximum"] = len(urls)
+        progress_bar["value"] = 0
 
         self.sun_image_container.update_idletasks()
 
-        # Delay processing to allow UI to draw progress bar
-        self.root.after(100, lambda: self._load_sun_images_with_progress(urls, progress))
+        # Run image loading in a separate thread
+        threading.Thread(target=self._load_images_thread, args=(urls, progress_bar), daemon=True).start()
 
 
+    def _load_images_thread(self, urls, progress):
+        """Runs in a separate thread to load images without freezing the UI."""
+        for index, (name, url) in enumerate(urls):
+            path = download_sun_image(name, url)
+            if path and path.exists():
+                self.root.after(0, lambda i=index, p=path, n=name: self._add_sun_image(p, n))
+            self.root.after(0, lambda v=index+1: progress.config(value=v))
+    
+        # Re-enable button when done
+        self.root.after(0, lambda: self.show_sun_button.config(state="normal"))
+
+        # Remove the progress bar after all images are loaded
+        progress.destroy()
+
+    def _add_sun_image(self, path, name):
+        """Safely adds image to UI from the main thread, with hover zoom."""
+        try:
+            # Load main image
+            img = Image.open(path)
+            img_resized = img.resize((400, 400))
+            photo = ImageTk.PhotoImage(img_resized)
+            self.sun_image_refs.append(photo)
+
+            # Load zoomed image
+            zoomed_img = img.resize((800, 800))
+            zoomed_photo = ImageTk.PhotoImage(zoomed_img)
+            self.sun_image_refs.append(zoomed_photo)
+
+            # Create frame for image & caption
+            frame = tk.Frame(self.sun_image_container, bg="#f0f0f0")
+            frame.pack(pady=10)
+
+            label = tk.Label(frame, image=photo)
+            label.pack()
+
+            caption = tk.Label(frame, text=name, font=("Arial", 10, "italic"))
+            caption.pack()
+
+            # Hover zoom handlers
+            def on_enter(event, img=zoomed_photo, title=name):
+                if self.zoom_window is not None:
+                    self.zoom_window.destroy()
+                self.zoom_window = tk.Toplevel()
+                self.zoom_window.title(f"Zoom: {title}")
+                self.zoom_window.geometry("+%d+%d" % (event.x_root + 20, event.y_root))
+                self.zoom_window.overrideredirect(True)
+                zoom_label = tk.Label(self.zoom_window, image=img)
+                zoom_label.pack()
+
+            def on_leave(event):
+                if self.zoom_window:
+                    self.zoom_window.destroy()
+                    self.zoom_window = None
+
+            label.bind("<Enter>", on_enter)
+            label.bind("<Leave>", on_leave)
+
+        except Exception as e:
+            print(f"[ERROR] Could not load image {name}: {e}")
 
     def setup_webcam_tab(self):
         tab = ttk.Frame(self.notebook)
