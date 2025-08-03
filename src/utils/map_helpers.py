@@ -1,46 +1,62 @@
 ﻿# -*- coding: utf-8 -*-
 """
 map_helpers.py
-=====================
-Helper functions for use with generation of maps showing
-probability of aurora visibility.
+==============
+Helper functions for generating maps that visualize aurora visibility probability.
+
+Responsibilities:
+- Filtering and normalizing aurora probability coordinate data.
+- Creating a configured Basemap instance for plotting.
+- Mapping probability values to colors for display.
 
 Dependencies:
     - numpy
     - mpl_toolkits.basemap
 """
+
 import numpy as np
 from mpl_toolkits.basemap import Basemap
 
+
+# -------------------------------------------------------------------
+# Coordinate Processing
+# -------------------------------------------------------------------
+
 def normalize_coordinates(coords):
     """
-    Filters and normalizes aurora coordinates.
+    Filter and normalize aurora coordinates for plotting.
 
-    - Keeps only points with probability ≥ 1
-    - Keeps latitudes ≥ ±45°
-    - Converts longitude from [0, 360] → [-180, 180]
+    Processing steps:
+        - Keep only points where probability ≥ 1%.
+        - Keep only points where latitude is within auroral zone (≥ ±45°).
+        - Convert longitudes from [0, 360] to [-180, 180].
 
     Args:
-        coords (list): List of [lon, lat, prob] entries.
+        coords (list): List of [longitude, latitude, probability].
 
     Returns:
-        list: Filtered and normalized coordinates.
+        list: Filtered and normalized coordinates as tuples (lon, lat, prob).
     """
     normalized = []
     for lon, lat, prob in coords:
         if prob >= 1.0 and abs(lat) >= 45.0:
+            # Adjust longitude range for Basemap compatibility
             if lon > 180:
                 lon -= 360
             normalized.append((lon, lat, prob))
     return normalized
 
 
+# -------------------------------------------------------------------
+# Basemap Setup
+# -------------------------------------------------------------------
+
 def create_basemap():
     """
-    Configures and returns a Basemap instance with coastlines, countries, etc.
+    Configure and return a Basemap instance with standard map features.
 
     Returns:
-        Basemap: Configured Basemap object.
+        Basemap: Configured Basemap object ready for plotting.
     """
     m = Basemap(projection='mill', lon_0=0, resolution='c')
 
@@ -55,15 +71,19 @@ def create_basemap():
     return m
 
 
+# -------------------------------------------------------------------
+# Probability-to-Color Mapping
+# -------------------------------------------------------------------
+
 def probability_to_color(prob):
     """
-    Maps aurora probability to a color.
+    Map aurora probability percentage to a corresponding color for plotting.
 
     Args:
-        prob (float): Probability percentage.
+        prob (float): Aurora visibility probability percentage.
 
     Returns:
-        str: Color name.
+        str: Color name representing probability level.
     """
     if prob >= 50:
         return "red"
