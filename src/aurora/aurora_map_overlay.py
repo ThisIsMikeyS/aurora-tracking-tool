@@ -17,8 +17,9 @@ import numpy as np
 import matplotlib.pyplot as plt
 from mpl_toolkits.basemap import Basemap
 from datetime import datetime, timezone
+from config import AURORA_VISIBILITY_URL, MAP_DIR, OVERLAY_MAP_NAME
 
-AURORA_VISIBILITY_URL = "https://services.swpc.noaa.gov/json/ovation_aurora_latest.json"
+IMAGE_PATH = MAP_DIR / OVERLAY_MAP_NAME
 
 
 def fetch_aurora_data():
@@ -38,7 +39,7 @@ def fetch_aurora_data():
         return []
 
 
-def generate_aurora_map(save_path="aurora_map.png"):
+def generate_aurora_map(save_path=IMAGE_PATH):
     """
     Generates and saves a map with aurora probability overlay.
 

@@ -12,6 +12,9 @@ from unittest.mock import patch, MagicMock
 
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'src')))
 from src.aurora import aurora_map_overlay as amo
+from config import MAP_DIR
+
+TEST_IMAGE_PATH = MAP_DIR / "test_aurora_map.png"
 
 class TestAuroraMapOverlay(unittest.TestCase):
 
@@ -38,14 +41,14 @@ class TestAuroraMapOverlay(unittest.TestCase):
     @patch("aurora.aurora_map_overlay.fetch_aurora_data", return_value=[])
     def test_generate_map_empty_data(self, mock_fetch):
         """Even with no coords, function still returns PNG filename."""
-        result = amo.generate_aurora_map("aurora_map.png")
-        self.assertEqual(result, "aurora_map.png")
+        result = amo.generate_aurora_map(TEST_IMAGE_PATH)
+        self.assertEqual(result, TEST_IMAGE_PATH)
 
     @patch("aurora.aurora_map_overlay.fetch_aurora_data", return_value=[(0, 80, 50)])
     def test_generate_map_valid_data(self, mock_fetch):
         """Valid coords should return PNG filename."""
-        result = amo.generate_aurora_map("test_map.png")
-        self.assertEqual(result, "test_map.png")
+        result = amo.generate_aurora_map(TEST_IMAGE_PATH)
+        self.assertEqual(result, TEST_IMAGE_PATH)
 
 if __name__ == "__main__":
     unittest.main()

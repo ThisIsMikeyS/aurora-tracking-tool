@@ -5,6 +5,7 @@ Includes API endpoints, default thresholds, update intervals, and alert settings
 """
 
 import os
+from pathlib import Path
 from datetime import timedelta
 
 # --------------------------------------------
@@ -105,11 +106,15 @@ CAMERA_TIMEZONES = {
 }
 
 # --------------------------------------------
-# EXPORT SETTINGS
+# EXPORT & DOWNLOAD SETTINGS
 # --------------------------------------------
 
 EXPORT_DIRECTORY = os.path.join(os.path.expanduser("~"), "Downloads")
 EXPORT_FILENAME_FORMAT = "aurora_report_%Y-%m-%d_%H-%M-%S.json"
+
+MAP_DIR = Path("assets/maps")
+OVERLAY_MAP_NAME = "aurora_map.png"
+SWPC_MAP_NAME = "aurora_forecast.jpg"
 
 # --------------------------------------------
 # UI SETTINGS

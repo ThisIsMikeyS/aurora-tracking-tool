@@ -9,14 +9,10 @@ import csv
 from io import StringIO
 from pathlib import Path
 from datetime import datetime, timedelta, timezone
+from config import PLASMA_URL, MAGNETIC_URL, SUN_IMAGE_URLS
 
 # Directory to store the latest image locally
 IMAGE_DIR = Path("assets/images")
-
-# Data URLs
-PLASMA_URL = "https://services.swpc.noaa.gov/products/solar-wind/plasma-1-day.json"
-MAGNETIC_URL = "https://services.swpc.noaa.gov/products/solar-wind/mag-1-day.json"
-SUN_IMAGE_URL = "https://sdo.gsfc.nasa.gov/assets/img/latest/latest_1024_0193.jpg"
 
 def get_solar_wind_data():
     """
@@ -118,25 +114,5 @@ def download_sun_image(name: str, url: str, save_dir: Path = IMAGE_DIR) -> Path:
 
 
 def get_sun_image_urls():
-    return [
-        ["solar_disk_aia_0193", "https://sdo.gsfc.nasa.gov/assets/img/latest/latest_1024_0193.jpg"],
-        ["solar_disk_aia_0304", "https://sdo.gsfc.nasa.gov/assets/img/latest/latest_1024_0304.jpg"],
-        ["solar_disk_aia_0171", "https://sdo.gsfc.nasa.gov/assets/img/latest/latest_1024_0171.jpg"],
-        ["solar_disk_aia_0211", "https://sdo.gsfc.nasa.gov/assets/img/latest/latest_1024_0211.jpg"],
-        ["solar_disk_aia_0131", "https://sdo.gsfc.nasa.gov/assets/img/latest/latest_1024_0131.jpg"],
-        ["solar_disk_aia_0335", "https://sdo.gsfc.nasa.gov/assets/img/latest/latest_1024_0335.jpg"],
-        ["solar_disk_aia_0094", "https://sdo.gsfc.nasa.gov/assets/img/latest/latest_1024_0094.jpg"],
-        ["solar_disk_aia_1600", "https://sdo.gsfc.nasa.gov/assets/img/latest/latest_1024_1600.jpg"],
-        ["solar_disk_aia_1700", "https://sdo.gsfc.nasa.gov/assets/img/latest/latest_1024_1700.jpg"],
-        ["solar_disk_aia_211193171", "https://sdo.gsfc.nasa.gov/assets/img/latest/latest_1024_211193171.jpg"],
-        ["solar_disk_aia_304211171", "https://sdo.gsfc.nasa.gov/assets/img/latest/f_304_211_171_1024.jpg"],
-        ["solar_disk_aia_94335193", "https://sdo.gsfc.nasa.gov/assets/img/latest/f_094_335_193_1024.jpg"],
-        ["solar_disk_aia_0171_HMIB", "https://sdo.gsfc.nasa.gov/assets/img/latest/f_HMImag_171_1024.jpg"],
-        ["solar_disk_HMIB", "https://sdo.gsfc.nasa.gov/assets/img/latest/latest_1024_HMIB.jpg"],
-        ["solar_disk_HMIBC", "https://sdo.gsfc.nasa.gov/assets/img/latest/latest_1024_HMIBC.jpg"],
-        ["solar_disk_HMIIC", "https://sdo.gsfc.nasa.gov/assets/img/latest/latest_1024_HMIIC.jpg"],
-        ["solar_disk_HMIIF", "https://sdo.gsfc.nasa.gov/assets/img/latest/latest_1024_HMIIF.jpg"],
-        ["solar_disk_HMII", "https://sdo.gsfc.nasa.gov/assets/img/latest/latest_1024_HMII.jpg"],
-        ["solar_disk_HMID", "https://sdo.gsfc.nasa.gov/assets/img/latest/latest_1024_HMID.jpg"]
-    ]
+    return SUN_IMAGE_URLS
 

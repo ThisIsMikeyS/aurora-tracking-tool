@@ -10,56 +10,7 @@ from datetime import datetime, timezone
 from astral.sun import sun
 from astral import LocationInfo
 from .kp_index import get_current_kp_index
-
-
-# -----------------------
-# Webcam List with Lat/Lon
-# -----------------------
-WEBCAM_LIST = [
-    {"location": "Tromsø", "country": "Norway", "lat": 69.6496, "lon": 18.9560, "url": "https://weather.cs.uit.no/"},
-    {"location": "Abisko", "country": "Sweden", "lat": 68.3518, "lon": 18.8294, "url": "https://lightsoverlapland.com/webcam/"},
-    {"location": "Kilpisjärvi", "country": "Finland", "lat": 69.0472, "lon": 20.7972, "url": "https://www.youtube.com/watch?v=ccTVAhJU5lg"},
-    {"location": "Fairbanks, AK", "country": "United States", "lat": 64.8378, "lon": -147.7164, "url": "https://www.youtube.com/watch?v=O52zDyxg5QI"},
-    {"location": "Yellowknife, NT", "country": "Canada", "lat": 62.4540, "lon": -114.3718, "url": "https://auroramax.com/live"},
-    {"location": "Kingston, TAS", "country": "Australia", "lat": -42.9728, "lon": 147.3050, "url": "https://www.allskycam.com/u.php?u=539"},
-    {"location": "Casey Station", "country": "Antarctica", "lat": -66.2833, "lon": 110.5333, "url": "https://www.antarctica.gov.au/antarctic-operations/webcams/casey/"},
-    {"location": "Shetland Islands", "country": "Scotland", "lat": 59.8541, "lon": -1.2752, "url": "https://www.shetlandwebcams.com/cliff-cam-3/"},
-    {"location": "Queenstown", "country": "New Zealand", "lat": -45.0311, "lon": 168.6625, "url": "https://queenstown.roundshot.com/#/"},
-    {"location": "Churchill", "country": "Canada", "lat": 58.7808, "lon": -94.1869, "url": "https://www.youtube.com/watch?v=a0i1Kg6fROg"},
-    {"location": "Porjus", "country": "Sweden", "lat": 66.9500, "lon": 19.8167, "url": "https://uk.jokkmokk.jp/detail_nr4.shtml"},
-    {"location": "Hella", "country": "Iceland", "lat": 63.9777, "lon": -20.2557, "url": "https://landhotel.is/index.php/northernlights-live"},
-    {"location": "Sodankylä", "country": "Finland", "lat": 67.4167, "lon": 26.5833, "url": "https://www.youtube.com/watch?v=zSGpRT-xIkQ"},
-    {"location": "Kuusamo", "country": "Finland", "lat": 65.9667, "lon": 29.1833, "url": "https://ruka3.panocloud.webcam/"},
-    {"location": "Sentermoen", "country": "Norway", "lat": 68.8609, "lon": 18.3483, "url": "https://www.yr.no/en/other-conditions/1-291747/Norway/Troms/Bardu/Setermoen"},
-    {"location": "Kangerlussuaq", "country": "Greenland", "lat": 67.0086, "lon": -50.6892, "url": "https://www.youtube.com/watch?v=dG4pb20EqJc"},
-    {"location": "Tampere", "country": "Finland", "lat": 61.4981, "lon": 23.7600, "url": "https://www.ursa.fi/yhd/tampereenursa/"},
-    {"location": "Ilulissat", "country": "Greenland", "lat": 69.2167, "lon": -51.1000, "url": "https://www.youtube.com/watch?v=EI27YpsNzSQ"},
-]
-
-# -----------------------
-# Manual Timezone Mapping
-# -----------------------
-CAMERA_TIMEZONES = {
-    "Tromsø": "Europe/Oslo",
-    "Abisko": "Europe/Stockholm",
-    "Kilpisjärvi": "Europe/Helsinki",
-    "Fairbanks, AK": "America/Anchorage",
-    "Yellowknife, NT": "America/Yellowknife",
-    "Kingston, TAS": "Australia/Hobart",
-    "Casey Station": "Antarctica/Casey",
-    "Shetland Islands": "Europe/London",
-    "Queenstown": "Pacific/Auckland",
-    "Churchill": "America/Winnipeg",
-    "Porjus": "Europe/Stockholm",
-    "Hella": "Atlantic/Reykjavik",
-    "Sodankylä": "Europe/Helsinki",
-    "Kuusamo": "Europe/Helsinki",
-    "Sentermoen": "Europe/Oslo",
-    "Kangerlussuaq": "America/Godthab",
-    "Tampere": "Europe/Helsinki",
-    "Ilulissat": "America/Godthab",
-}
-
+from config import WEBCAM_LIST, CAMERA_TIMEZONES
 
 # -----------------------
 # Darkness Detection

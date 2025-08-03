@@ -20,14 +20,15 @@ from aurora.forecast import get_hourly_forecast, get_long_term_forecast, plot_3_
 from aurora.swpc_map import download_swpc_map
 from aurora.solar_data import download_sun_image, get_solar_wind_data, get_sun_image_urls
 from aurora.webcams import get_live_webcams_location_sorted, get_live_webcams_country_sorted, get_live_webcams_best_sorted
+from config import UISettings, OVERLAY_MAP_INFO, WEBCAM_TAB_INFO
 from PIL import Image, ImageTk
 
 
 class AuroraTrackerApp:
     def __init__(self, root):
         self.root = root
-        self.root.title("Aurora Tracker")
-        self.root.geometry("900x800")
+        self.root.title(UISettings.WINDOW_TITLE)
+        self.root.geometry(UISettings.WINDOW_SIZE)
 
         # Set custom icon (for Windows)
         icon_path_ico = os.path.join("assets", "icons", "aurora_tracker_icon.ico")
@@ -40,29 +41,24 @@ class AuroraTrackerApp:
         # Use a base theme that works cross-platform
         style.theme_use("clam")
         
-        # Set global colors
-        dark_bg = "#1f1f2e"  # dark navy
-        dark_fg = "#e0f7fa"  # light cyan text
-        accent = "#2e3b4e"   # slightly lighter for tabs / accents
-        
         style.configure(".", 
-                        background=dark_bg,
-                        foreground=dark_fg,
-                        fieldbackground=dark_bg)
+                        background=UISettings.DARK_THEME_BG,
+                        foreground=UISettings.DARK_THEME_FG,
+                        fieldbackground=UISettings.DARK_THEME_BG)
         
         # Configure ttk.Notebook tabs
-        style.configure("TNotebook", background=dark_bg, borderwidth=0)
-        style.configure("TNotebook.Tab", background=accent, foreground=dark_fg)
+        style.configure("TNotebook", background=UISettings.DARK_THEME_BG, borderwidth=0)
+        style.configure("TNotebook.Tab", background=UISettings.DARK_THEME_ACCENT, foreground=UISettings.DARK_THEME_FG)
         style.map("TNotebook.Tab",
-                  background=[("selected", dark_bg)],
-                  foreground=[("selected", dark_fg)])
+                  background=[("selected", UISettings.DARK_THEME_BG)],
+                  foreground=[("selected", UISettings.DARK_THEME_FG)])
         
         # Configure ttk.Labels & Buttons
-        style.configure("TLabel", background=dark_bg, foreground=dark_fg)
-        style.configure("TButton", background=accent, foreground=dark_fg)
+        style.configure("TLabel", background=UISettings.DARK_THEME_BG, foreground=UISettings.DARK_THEME_FG)
+        style.configure("TButton", background=UISettings.DARK_THEME_ACCENT, foreground=UISettings.DARK_THEME_FG)
         style.map("TButton", background=[("active", "#3a4b63")])
         
-        self.root.configure(bg=dark_bg)
+        self.root.configure(bg=UISettings.DARK_THEME_BG)
 
         self.notebook = ttk.Notebook(self.root)
         self.notebook.pack(fill=tk.BOTH, expand=True)
@@ -259,18 +255,7 @@ class AuroraTrackerApp:
             messagebox.showerror("Aurora Map Error", str(e))
 
     def show_map_help(self):
-        help_text = (
-            "🗺️ Aurora Map Overlay Help\n\n"
-            "This map shows the probability of seeing the aurora based on NOAA's Ovation model.\n\n"
-            "To maximise your changes of seeing the aurora, try to find an area with a red, orange or green colour, and without cloud coverage.\n\n"
-            "Colour Legend:\n"
-            "  🔴 Red: 50%+ chance of seeing aurora.\n"
-            "  🟠 Orange: 30% to 49% chance of seeing aurora.\n"
-            "  🟢 Green: 10% to 29% chance of seeing aurora.\n"
-            "  ⚫ Dark Grey: 1% to 9%vchance of seeing aurora.\n\n"
-            "The map updates dynamically using the latest space weather data."
-        )
-        messagebox.showinfo("Aurora Map Help", help_text)
+        messagebox.showinfo("Aurora Map Help", OVERLAY_MAP_INFO)
 
     def setup_forecast_tab(self):
         tab = ttk.Frame(self.notebook)
@@ -568,20 +553,5 @@ class AuroraTrackerApp:
                 messagebox.showerror("Webcam Error", f"No URL found for {location}")
 
     def show_webcams_help(self):
-        help_text = (
-            "Aurora Webcams Tab Help\n\n"
-            "This tab shows a list of live webcam streams from locations around the world where the aurora (Northern or Southern Lights) may be visible.\n\n"
-            "How it works:\n"
-            "- The list is automatically sorted to prioritize webcams where the aurora is most likely visible right now.\n"
-            "- This takes into account:\n"
-            "   • The current Kp index (a measure of geomagnetic activity).\n"
-            "   • The latitude of the location.\n"
-            "   • Whether it is currently dark at the location (since aurora cannot be seen in daylight).\n\n"
-            "How to use:\n"
-            "1. Click on any webcam from the list.\n"
-            "2. Click the 'Open Webcam' button to open the live stream in your browser.\n\n"
-            "Use the Help button at any time to revisit these instructions."
-        )
-        from tkinter import messagebox
-        messagebox.showinfo("Aurora Webcams Help", help_text)
+        messagebox.showinfo("Aurora Webcams Help", WEBCAM_TAB_INFO)
 

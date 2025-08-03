@@ -10,10 +10,7 @@ import matplotlib.ticker as mticker
 from aurora.libraries import get_kp_index
 from src.aurora.kp_index import get_current_kp_index
 from utils.chart_helpers import get_kp_color
-
-# URLs for NOAA's aurora short-term and long-term forecasts
-HOURLY_FORECAST_API = "https://services.swpc.noaa.gov/products/noaa-planetary-k-index-forecast.json"
-LONG_TERM_FORECAST_API = "https://services.swpc.noaa.gov/text/27-day-outlook.txt"
+from config import HOURLY_FORECAST_API, LONG_TERM_FORECAST_API
 
 
 # def get_hourly_forecast():

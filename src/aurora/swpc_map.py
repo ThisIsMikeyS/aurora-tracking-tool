@@ -8,14 +8,10 @@ import os
 import requests
 from datetime import datetime
 from pathlib import Path
-
-# SWPC Ovation map (Northern Hemisphere) – this URL is typically refreshed every 5–15 minutes
-SWPC_IMAGE_URL = "https://services.swpc.noaa.gov/images/animations/ovation/north/latest.jpg"
+from config import SWPC_IMAGE_URL, MAP_DIR, SWPC_MAP_NAME
 
 # Directory to store the latest image locally
-IMAGE_DIR = Path("assets/maps")
-IMAGE_NAME = "aurora_forecast.jpg"
-IMAGE_PATH = IMAGE_DIR / IMAGE_NAME
+IMAGE_PATH = MAP_DIR / SWPC_MAP_NAME
 
 
 def download_swpc_map(save_path: Path = IMAGE_PATH) -> Path:
