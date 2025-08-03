@@ -1,57 +1,48 @@
 # -*- coding: utf-8 -*-
 """
-Fetches the current Kp index and assesses aurora visibility by latitude.
+kp_index.py
+===========
+Fetches the current Kp index from the GFZ Kp Index service and
+provides a rough estimate of aurora visibility zones based on Kp values.
+
+Functions:
+    - get_current_kp_index(): Retrieve the latest Kp index value
+    - get_visibility_zone(kp): Map Kp value to approximate visible latitude range
 """
 
 import requests
-from datetime import datetime, timedelta, timezone
+from datetime import datetime, timezone
 from .libraries.get_kp_index import getKpindex
 
-# def get_current_kp_index():
-#     """
-#     Fetches the current KP index from NOAA SWPC API.
-#     Returns the most recent KP index as a float or None if unavailable.
-#     """
-#     try:
-#         response = requests.get("https://services.swpc.noaa.gov/json/planetary_k_index_1m.json", timeout=10)
-#         response.raise_for_status()
-#         data = response.json()
 
-#         print("[DEBUG] KP Index API response:", data)  # Optional debug line
-
-#         if isinstance(data, list) and data:
-#             latest = data[-1]
-#             kp = latest.get("kp_index") or latest.get("Kp")  # Try both common key names
-#             if kp is None:
-#                 raise ValueError("KP index not found in latest response item.")
-#             return float(kp)
-
-#         raise ValueError("Unexpected KP index response format.")
-
-#     except Exception as e:
-#         print(f"[ERROR] Failed to get Kp index: {e}")
-#         return None
-
-
+# =========================================
+# FETCH CURRENT Kp INDEX
+# =========================================
 def get_current_kp_index():
     """
-    Retrieve the most recent available Kp index using the GFZ Kp index service.
+    Retrieve the most recent available Kp index from GFZ service.
 
     Returns:
-        float or str: Most recent Kp index, or a string explaining an error.
+        float: Latest Kp index value if available.
+        str: Message if data is unavailable or an error occurs.
     """
     try:
-        # Define time window: today from 00:00Z to now
         now = datetime.now(timezone.utc)
+
+        # Build time range: from midnight UTC today to now
         start_time = now.strftime("%Y-%m-%dT00:00:00Z")
         end_time = now.strftime("%Y-%m-%dT%H:%M:%SZ")
 
-        times, kp_values, statuses = getKpindex(start_time, end_time, index="Kp", status="all")
+        # Request Kp index values
+        times, kp_values, statuses = getKpindex(
+            start_time, end_time, index="Kp", status="all"
+        )
 
+        # Handle empty response
         if not times or not kp_values:
             return "Unavailable: No Kp index data returned."
 
-        # Find the latest available value before now
+        # Find most recent Kp value at or before current time
         latest_index = None
         for t, val in zip(times, kp_values):
             t_obj = datetime.strptime(t, "%Y-%m-%dT%H:%M:%SZ").replace(tzinfo=timezone.utc)
@@ -60,31 +51,45 @@ def get_current_kp_index():
             else:
                 break
 
-        return float(latest_index) if latest_index is not None else "Unavailable: No valid value found."
+        return (
+            float(latest_index)
+            if latest_index is not None
+            else "Unavailable: No valid value found."
+        )
 
     except Exception as e:
         print(f"[ERROR] Failed to get Kp index: {e}")
         return f"Unavailable: {e}"
 
 
+# =========================================
+# DETERMINE VISIBILITY ZONE
+# =========================================
 def get_visibility_zone(kp):
     """
-    Estimate aurora visibility zone by Kp value.
-    Kp values roughly correspond to geographic latitude bands.
+    Estimate approximate geographic latitude range where aurora is visible,
+    based on Kp index level.
+
+    Args:
+        kp (float|int|None): Kp index value.
+
+    Returns:
+        str: Description of visibility latitude band.
     """
     if kp is None:
         return "Unknown"
 
-    visibility = {
+    visibility_map = {
         0: "Very High Latitudes (e.g. North Pole)",
-        1: "Arctic Circle (approx. 66 degrees)",
-        2: "Iceland, Tromso",
+        1: "Arctic Circle (~66\u00B0)",
+        2: "Iceland, Troms\u00F8",
         3: "Northern Scandinavia",
         4: "Southern Norway, Scotland",
         5: "UK, Germany, Canada border",
-        6: "Central Europe/North USA",
+        6: "Central Europe, North USA",
         7: "France, New York",
         8: "Spain, California",
         9: "Mexico, North Africa"
     }
-    return visibility.get(int(kp), "Unavailable")
+
+    return visibility_map.get(int(kp), "Unavailable")

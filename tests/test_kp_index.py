@@ -69,12 +69,12 @@ class TestKpIndex(unittest.TestCase):
         """Test mapping for all Kp values 0 to 9."""  # ASCII dash now
         expected_mapping = {
             0: "Very High Latitudes (e.g. North Pole)",
-            1: "Arctic Circle (approx. 66 degrees)",
-            2: "Iceland, Tromso",
+            1: "Arctic Circle (~66\u00B0)",
+            2: "Iceland, Troms\u00F8",
             3: "Northern Scandinavia",
             4: "Southern Norway, Scotland",
             5: "UK, Germany, Canada border",
-            6: "Central Europe/North USA",
+            6: "Central Europe, North USA",
             7: "France, New York",
             8: "Spain, California",
             9: "Mexico, North Africa",
