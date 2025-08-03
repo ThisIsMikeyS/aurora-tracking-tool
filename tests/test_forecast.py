@@ -1,9 +1,10 @@
 """
-Unit tests for the forecast.py
-Tests for:
-- Retrieval and parsing of hourly (3?day) and long?term (27?day) aurora forecasts.
+Unit tests for forecast.py
+
+Covers:
+- Retrieval and parsing of hourly (3-day) and long-term (27-day) aurora forecasts.
 - Robust handling of malformed data and network/API exceptions.
-- Proper integration with plotting functions to generate forecast charts.
+- Chart plotting functions for both forecast types.
 Uses unittest with mocks for API calls and matplotlib.
 """
 
@@ -15,11 +16,17 @@ from src.aurora import forecast
 
 
 class TestForecast(unittest.TestCase):
+    """Unit tests for forecast data retrieval and plotting."""
 
-    # ---------- get_hourly_forecast Tests ----------
+    # ----------------------------------------------------------------------
+    # get_hourly_forecast() Tests
+    # ----------------------------------------------------------------------
+
     @patch("src.aurora.forecast.requests.get")
     def test_get_hourly_forecast_success(self, mock_get):
-        """Test normal 3-day forecast parsing returns times and values."""
+        """
+        Test normal 3-day forecast parsing returns valid times and float values.
+        """
         now = datetime.now(timezone.utc)
         mock_data = [
             ["time_tag", "kp_index"],  
@@ -35,27 +42,36 @@ class TestForecast(unittest.TestCase):
 
     @patch("src.aurora.forecast.requests.get")
     def test_get_hourly_forecast_empty(self, mock_get):
-        """Test empty forecast data returns empty lists."""
+        """
+        Test empty forecast data returns empty lists.
+        """
         mock_get.return_value.json.return_value = [["header1", "header2"]]
         mock_get.return_value.raise_for_status = MagicMock()
+
         times, values = forecast.get_hourly_forecast()
         self.assertEqual(times, [])
         self.assertEqual(values, [])
 
     @patch("src.aurora.forecast.requests.get")
     def test_get_hourly_forecast_exception(self, mock_get):
-        """Test network exception returns empty lists."""
+        """
+        Test network exception returns empty lists.
+        """
         mock_get.return_value.raise_for_status.side_effect = Exception("Network error")
+
         times, values = forecast.get_hourly_forecast()
         self.assertEqual(times, [])
         self.assertEqual(values, [])
 
+    # ----------------------------------------------------------------------
+    # get_long_term_forecast() Tests
+    # ----------------------------------------------------------------------
 
-    # ---------- get_long_term_forecast Tests ----------
     @patch("src.aurora.forecast.requests.get")
     def test_get_long_term_forecast_success(self, mock_get):
-        """Test parsing of valid 27-day forecast."""
-        # Format matches parsing condition: len(parts) >= 6
+        """
+        Test parsing of valid 27-day forecast lines.
+        """
         mock_text = """1 Jan 2025 X X 4.0 X
 2 Jan 2025 X X 3.5 X"""
         mock_get.return_value.text = mock_text
@@ -67,8 +83,10 @@ class TestForecast(unittest.TestCase):
 
     @patch("src.aurora.forecast.requests.get")
     def test_get_long_term_forecast_malformed(self, mock_get):
-        """Test malformed forecast lines are skipped."""
-        mock_text = """Bad Line Without Enough Parts"""
+        """
+        Test malformed forecast lines are skipped.
+        """
+        mock_text = "Bad Line Without Enough Parts"
         mock_get.return_value.text = mock_text
         mock_get.return_value.raise_for_status = MagicMock()
 
@@ -78,33 +96,46 @@ class TestForecast(unittest.TestCase):
 
     @patch("src.aurora.forecast.requests.get")
     def test_get_long_term_forecast_exception(self, mock_get):
-        """Test network exception returns empty lists."""
+        """
+        Test network exception returns empty lists.
+        """
         mock_get.return_value.raise_for_status.side_effect = RequestException("Network error")
+
         dates, kps = forecast.get_long_term_forecast()
         self.assertEqual(dates, [])
         self.assertEqual(kps, [])
 
+    # ----------------------------------------------------------------------
+    # plot_3_day_forecast_chart() Tests
+    # ----------------------------------------------------------------------
 
-    # ---------- plot_3_day_forecast_chart Tests ----------
     @patch("src.aurora.forecast.plt")
     def test_plot_3_day_forecast_chart(self, mock_plt):
-        """Test 3-day forecast plotting creates bars with correct labels."""
+        """
+        Test that 3-day forecast plotting triggers draw call.
+        """
         mock_plt.subplots.return_value = (MagicMock(), MagicMock())
         mock_self = MagicMock()
         times = ["2025-01-01 00:00:00", "2025-01-01 03:00:00"]
         values = [3.0, 4.0]
+
         forecast.plot_3_day_forecast_chart(mock_self, times, values)
         mock_self._draw_forecast_chart.assert_called()
 
+    # ----------------------------------------------------------------------
+    # plot_long_term_forecast_chart() Tests
+    # ----------------------------------------------------------------------
 
-    # ---------- plot_long_term_forecast_chart Tests ----------
     @patch("src.aurora.forecast.plt")
     def test_plot_long_term_forecast_chart(self, mock_plt):
-        """Test 27-day forecast plotting creates bars with correct labels."""
+        """
+        Test that 27-day forecast plotting triggers draw call.
+        """
         mock_plt.subplots.return_value = (MagicMock(), MagicMock())
         mock_self = MagicMock()
         dates = ["1 Jan", "2 Jan"]
         values = [3.5, 5.0]
+
         forecast.plot_long_term_forecast_chart(mock_self, dates, values)
         mock_self._draw_forecast_chart.assert_called()
 

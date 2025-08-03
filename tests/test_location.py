@@ -1,20 +1,29 @@
-# -*- coding: utf-8 -*-
+﻿# -*- coding: utf-8 -*-
 """
 Unit tests for location.py
-Covers success, missing data, invalid JSON, HTTP error, and network failures.
+
+Covers:
+- Successful location retrieval.
+- Missing fields in API response.
+- Invalid JSON parsing.
+- HTTP and network errors.
 """
 
 import unittest
 from unittest.mock import patch, MagicMock
 import requests
-from src.aurora import location  # Adjust path if needed
+from src.aurora import location
 
 
 class TestLocation(unittest.TestCase):
+    """Unit tests for get_user_location in location.py"""
 
+    # -------------------------
+    # Success Case
+    # -------------------------
     @patch("src.aurora.location.requests.get")
     def test_get_user_location_success(self, mock_get):
-        """Test normal successful API response with full data."""
+        """API returns valid data → function should return populated dict."""
         mock_response = MagicMock()
         mock_response.raise_for_status.return_value = None
         mock_response.json.return_value = {
@@ -32,12 +41,15 @@ class TestLocation(unittest.TestCase):
         self.assertEqual(result["country"], "Norway")
         self.assertAlmostEqual(result["latitude"], 69.6496)
 
+    # -------------------------
+    # Missing or Invalid Data
+    # -------------------------
     @patch("src.aurora.location.requests.get")
     def test_get_user_location_missing_fields(self, mock_get):
-        """Test API returns missing fields. Should still return dict with None values."""
+        """API returns missing fields → function should still return dict with None values."""
         mock_response = MagicMock()
         mock_response.raise_for_status.return_value = None
-        mock_response.json.return_value = {}  # Missing everything
+        mock_response.json.return_value = {}  # Missing all fields
         mock_get.return_value = mock_response
 
         result = location.get_user_location()
@@ -47,7 +59,7 @@ class TestLocation(unittest.TestCase):
 
     @patch("src.aurora.location.requests.get")
     def test_get_user_location_invalid_json(self, mock_get):
-        """Test API returns invalid JSON. Should return None gracefully."""
+        """API returns invalid JSON → function should return None."""
         mock_response = MagicMock()
         mock_response.raise_for_status.return_value = None
         mock_response.json.side_effect = ValueError("Invalid JSON")
@@ -56,9 +68,12 @@ class TestLocation(unittest.TestCase):
         result = location.get_user_location()
         self.assertIsNone(result)
 
+    # -------------------------
+    # Error Handling
+    # -------------------------
     @patch("src.aurora.location.requests.get")
     def test_get_user_location_http_error(self, mock_get):
-        """Test HTTP error during request."""
+        """HTTP error should cause function to return None."""
         mock_response = MagicMock()
         mock_response.raise_for_status.side_effect = requests.HTTPError("Bad Request")
         mock_get.return_value = mock_response
@@ -68,7 +83,7 @@ class TestLocation(unittest.TestCase):
 
     @patch("src.aurora.location.requests.get")
     def test_get_user_location_network_error(self, mock_get):
-        """Test network error (timeout, connection error, etc.)."""
+        """Network error (timeout, connection issues) should cause function to return None."""
         mock_get.side_effect = requests.RequestException("Network failure")
 
         result = location.get_user_location()
