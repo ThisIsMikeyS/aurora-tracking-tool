@@ -38,6 +38,7 @@
     <Compile Include="src\utils\chart_helpers.py" />
     <Compile Include="src\utils\geo_utils.py" />
     <Compile Include="src\utils\image_utils.py" />
+    <Compile Include="src\utils\map_helpers.py" />
     <Compile Include="src\utils\__init__.py" />
     <Compile Include="src\__init__.py" />
     <Compile Include="tests\test_aurora_map_overlay.py" />

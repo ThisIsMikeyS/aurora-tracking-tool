@@ -1,33 +1,44 @@
+# -*- coding: utf-8 -*-
 """
 aurora_map_overlay.py
-==========================
-Generates a world map overlaid with aurora visibility probabilities using the 
-SWPC Ovation Aurora Forecast. The result is saved as an image for display in the GUI.
+=====================
+Generates a world map with aurora visibility probabilities
+overlaid using the SWPC Ovation Aurora Forecast.
+
+Output is saved as an image for display in the Aurora Tracker GUI.
 
 Dependencies:
-- requests
-- matplotlib
-- (mpl_toolkits).basemap
-- numpy
+    - requests
+    - numpy
+    - matplotlib
+    - mpl_toolkits.basemap
 """
 
 import os
-import requests
+from datetime import datetime, timezone
+
 import numpy as np
 import matplotlib.pyplot as plt
 from mpl_toolkits.basemap import Basemap
-from datetime import datetime, timezone
-from config import AURORA_VISIBILITY_URL, MAP_DIR, OVERLAY_MAP_NAME
+import requests
 
+from config import AURORA_VISIBILITY_URL, MAP_DIR, OVERLAY_MAP_NAME
+from utils.map_helpers import normalize_coordinates, create_basemap, probability_to_color
+
+# Default output path for generated overlay image
 IMAGE_PATH = MAP_DIR / OVERLAY_MAP_NAME
 
 
+# =========================
+#  DATA FETCHING
+# =========================
 def fetch_aurora_data():
     """
     Fetch aurora probability data from the SWPC Ovation Aurora Forecast API.
 
     Returns:
         list: List of [longitude, latitude, probability] records.
+              Returns empty list if data cannot be fetched.
     """
     try:
         response = requests.get(AURORA_VISIBILITY_URL, timeout=10)
@@ -39,64 +50,50 @@ def fetch_aurora_data():
         return []
 
 
+# =========================
+#  MAP GENERATION
+# =========================
 def generate_aurora_map(save_path=IMAGE_PATH):
     """
-    Generates and saves a map with aurora probability overlay.
+    Generates and saves a map image with aurora probability overlay.
 
     Args:
-        save_path (str): File path to save the generated image.
+        save_path (str or Path): File path to save the generated image.
+
+    Returns:
+        Path or None: Path to saved image if successful, None if failed.
     """
     coords = fetch_aurora_data()
     if not coords:
         print("[WARN] No aurora data available to render.")
         return None
 
-    # Normalize longitudes from [0, 360] → [-180, 180] and out only points with probability >= 1 and latitudes within the auroral zones (≥45°).
-    normalized_coords = []
-    for lon, lat, prob in coords:
-        if prob >= 1.0 and abs(lat) >= 45.0:
-            if lon > 180:
-                lon -= 360
-            normalized_coords.append((lon, lat, prob))
+    # Filter and normalize coordinates
+    normalized_coords = normalize_coordinates(coords)
 
-    # Extract values for plotting
+    # Extract longitude, latitude, and probability values
     lon = np.array([pt[0] for pt in normalized_coords])
     lat = np.array([pt[1] for pt in normalized_coords])
     prob = np.array([pt[2] for pt in normalized_coords])
 
-    # Set up the map
+    # Initialize map figure
     fig = plt.figure(figsize=(14, 8))
-    m = Basemap(projection='mill', lon_0=0, resolution='c')
+    m = create_basemap()
 
-    m.drawcoastlines()
-    m.drawcountries()
-    m.drawmapboundary(fill_color='midnightblue')
-    m.fillcontinents(color='lightgray', lake_color='midnightblue')
-    m.drawparallels(np.arange(-90, 91, 30), labels=[1, 0, 0, 0])
-    m.drawmeridians(np.arange(-180, 181, 60), labels=[0, 0, 0, 1])
-
-    # Map projection
+    # Map projection of points
     x, y = m(lon, lat)
 
-    # Convert probabilities to color
-    def prob_to_color(p):
-        if p >= 50:
-            return "red"
-        elif p >= 30:
-            return "orange"
-        elif p >= 10:
-            return "green"
-        elif p >= 1:
-            return "dimgray"
-        return "black"
+    # Assign colors based on probability
+    colors = [probability_to_color(p) for p in prob]
 
-    colors = [prob_to_color(p) for p in prob]
-
-    # Draw points
+    # Plot points on map
     m.scatter(x, y, c=colors, s=3, alpha=0.7)
 
+    # Add title with timestamp
     plt.title(f"Aurora Visibility Probability\n{datetime.now(timezone.utc).strftime('%Y-%m-%d %H:%M UTC')}")
     plt.tight_layout()
+
+    # Save and close figure
     plt.savefig(save_path, dpi=300, bbox_inches='tight')
     plt.close()
 
