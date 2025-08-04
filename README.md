@@ -21,7 +21,7 @@ It features a Tkinter GUI with multiple tabs for Kp index, aurora maps, solar wi
 ## 📸 Screenshots
 
 | Kp Index & Visibility | Forecasts | Solar Data | Sun Images | Aurora Webcams |
-|-------------|-----------|-----------|----------------|----------------|
+|-----------------------|-----------|------------|------------|----------------|
 | ![Kp Map Tab](assets/screenshots/kp-and-aurora-map-screenshot.png) | ![Forecast Tab](assets/screenshots/long-term-forecast-screenshot.png) | ![Solar Data Tab](assets/screenshots/solar-data-screenshot.png) | ![Sun Images Tab](assets/screenshots/sun-images-screenshot.png) | ![Webcams Tab](assets/screenshots/aurora-webcams-screenshot.png)
 
 ---
@@ -52,6 +52,8 @@ aurora-tracking-tool/
 │   ├── utils/
 │   │   ├── __init__.py
 │   │   ├── api_helpers.py           # Common API request/response parsing
+│   │   ├── chart_helpers.py         # Chart coloring & helper functions
+│   │   ├── map_helpers.py           # Map projection setup & color mapping
 │   │   ├── image_utils.py           # Handle map/satellite image processing
 │   │   └── geo_utils.py             # Coordinate and time zone utilities
 │
@@ -119,38 +121,27 @@ python -m src.gui
 ## 🖥️ Usage
 Once started:
 
-- The **KP Index & Visibility** tab shows the current Kp index and an aurora map overlay.
+- **KP Index & Visibility** – Shows the current Kp index and aurora map overlay.
+- **Forecasts** – Displays both short-term and long-term Kp index predictions.
+- **Solar Data** – Plots recent solar wind and magnetic field measurements.
+- **Sun Images** – Shows NASA SDO imagery with zoom support.
+- **Aurora Webcams** – Lists live aurora webcams sorted by visibility.
 
-- The **Forecasts** tab displays both short-term and long-term Kp index predictions.
+ℹ️ Tooltips and help dialogs are available in certain sections.
 
-- The **Solar Data** tab plots recent solar wind and magnetic field measurements.
-
-- The **Sun Images** tab shows NASA SDO imagery with zoom support.
-
-- The **Aurora Webcams** tab lists live aurora webcams sorted by visibility.
-
-ℹ️ The application offers help tooltips on some sections for guidance.
-
+---
 
 ## 🧪 Running Tests
 
-To run the unit tests:
+Run all tests:
 ```bash
 python -m unittest discover tests
 ```
 
-Includes tests for:
-- Kp index retrieval
-- Aurora map generation
-- Solar wind data fetching
-- Webcam ranking
-- Location data parsing
-- GUI logic
-
-### Expected final output:
+Expected output:
 ```
 ----------------------------------------------------------------------
-Ran 61 tests in 8.373s
+Ran 61 tests in X.XXXs
 
 OK
 ```
@@ -168,13 +159,12 @@ OK
 - Additional aurora webcams
 - Webcam preview thumbnails
 - Exportable reports of aurora activity
-- Bug fixing
 
 ---
 
 ## 📚 License
 
-This project is licensed under the MIT License — see [LICENSE](LICENSE) for details.
+Licensed under the MIT License — see [LICENSE](LICENSE) for details.
 
 ---
 
@@ -188,9 +178,9 @@ Freelance Software & Systems Developer | Technical Writer
 
 ## 🌐 Acknowledgments
 
-Special thanks to the following data providers and libraries:
+Special thanks to:
 - GFZ for Kp index data
 - NOAA SWPC for space weather forecast data
 - NASA SDO for solar imagery
 - IP-API for geolocation services
-- All aurora webcam providers for their live streams
+- Aurora webcam providers for their live streams
