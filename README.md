@@ -116,7 +116,7 @@ aurora-tracking-tool/
 
 To start the GUI:
 ```bash
-python -m src.gui
+python -m src.main
 ```
 
 **Note:** Ensure you have internet access for live data (NOAA, NASA, webcams).
