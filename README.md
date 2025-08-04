@@ -20,9 +20,9 @@ It features a Tkinter GUI with multiple tabs for Kp index, aurora maps, solar wi
 
 ## 📸 Screenshots
 
-| Screenshot #1 | Screenshot #2 | Screenshot #3 | Screenshot #4 |
-|-------------|-----------|-----------|----------------|
-| TBC | TBC | TBC | TBC |
+| Kp Index & Visibility | Forecasts | Solar Data | Sun Images | Aurora Webcams |
+|-------------|-----------|-----------|----------------|----------------|
+| ![Kp Map Tab](assets/screenshots/kp-and-aurora-map-screenshot.png) | ![Forecast Tab](assets/screenshots/long-term-forecast-screenshot.png) | ![Solar Data Tab](assets/screenshots/solar-data-screenshot.png) | ![Sun Images Tab](assets/screenshots/sun-images-screenshot.png) | ![Webcams Tab](assets/screenshots/aurora-webcams-screenshot.png)
 
 ---
 
@@ -165,7 +165,9 @@ OK
 - Light/dark theme toggle
 - Responsive GUI design
 - Auroral oval prediction animation
+- Additional aurora webcams
 - Webcam preview thumbnails
+- Exportable reports of aurora activity
 - Bug fixing
 
 ---
