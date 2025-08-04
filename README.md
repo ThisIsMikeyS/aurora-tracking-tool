@@ -9,12 +9,12 @@ It features a Tkinter GUI with multiple tabs for Kp index, aurora maps, solar wi
 
 ## ✨ Features
 
-- **Real-time Kp Index** – Displays current geomagnetic activity.
-- **Aurora Forecast Map Overlay** – Generates global aurora probability maps using NOAA Ovation model.
-- **Short-term & Long-term Forecasts** – 3-day and 27-day Kp index forecasts plotted as bar charts.
-- **Solar Wind Data** – Live Bz, Bt, speed, and density plots.
-- **Sun Images** – Fetches latest SDO sun imagery.
-- **Aurora Webcams** – Curated list of live streams ranked by visibility.
+📊 **Real-time Kp Index** – Displays current geomagnetic activity.
+🗺️ **Aurora Forecast Map Overlay** – Generates global aurora probability maps using NOAA Ovation model.
+📅 **Short-term & Long-term Forecasts** – 3-day and 27-day Kp index forecasts plotted as bar charts.
+🌬️ **Solar Wind Data** – Live Bz, Bt, speed, and density plots.
+🌞 **Sun Images** – Fetches latest SDO sun imagery.
+📹 **Aurora Webcams** – Curated list of live streams ranked by visibility.
 
 ---
 
